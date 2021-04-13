@@ -52,7 +52,7 @@ def run_prompt(target, listener, debugger):
                 print("Already detached.")
             else:
                 detach(target, listener)
-        elif cmd == "info":
+        elif cmd == "ps":
             info(target)
         elif cmd == "find":
             if len(input_text_list) < 2:
@@ -79,6 +79,7 @@ def run_prompt(target, listener, debugger):
             value = int(input_text_list[1])
             patch(process, value, addr_cache)
         elif cmd == "exit":
+            print('Bye!')
             lldb_exit(target, debugger)
         else:
             print('Command not found...')
