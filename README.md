@@ -37,11 +37,38 @@ Here are the commands available in an interactive prompt.
 #### find
 Search the specified integer on memory.
 
+```
+> find 999986
+Success to halt process
+Scanning: 0x00000001025e4000-0x00000001025e8000
+Scanning: 0x00000001025f4000-0x00000001025fc000
+Scanning: 0x0000000102604000-0x0000000102608000
+....
+Scanning: 0x000000016eb34000-0x000000016ebbc000
+Scanning: 0x000000016ebc0000-0x000000016ebe8000
+Scanning: 0x000000016ebec000-0x000000016ec74000
+Scanning: 0x000000016ec78000-0x000000016ed00000
+Found: 1!!
+Address: 0x10a2feea0
+```
+
 #### filter
 Filter previous search results that match the current search results.
 
+```
+> filter 999842
+Success to halt process
+Found: 1!!
+Address: 0x1087beea0
+```
+
 #### patch
 Write the specified value on the address found by search.
+
+```
+> patch 10
+Successfully patched!
+```
 
 #### ps
 Get information about the target process.

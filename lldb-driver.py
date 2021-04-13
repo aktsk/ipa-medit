@@ -248,7 +248,7 @@ def patch(process, search_pattern, addr_cache):
         if not err.Success():
             print('Failed to write memory')
         else:
-            print('Success to write memory')
+            print('Successfully patched!')
 
 
 def filter_addr(process, search_pattern, addr_cache):
@@ -258,8 +258,6 @@ def filter_addr(process, search_pattern, addr_cache):
         err = lldb.SBError()
         memory_length = len(target_bytes)
         memory_bytes = process.ReadMemory(begin_addr, memory_length, err)
-        print(memory_bytes, target_bytes)
-        print(memory_length, len(target_bytes))
         if target_bytes == memory_bytes:
             result.append((begin_addr, search_type))
     print('Found: {0}!!'.format(len(result)))
