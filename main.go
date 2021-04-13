@@ -3,14 +3,13 @@ package main
 import (
 	"bytes"
 	"errors"
-	"fmt"
 	"flag"
+	"fmt"
 	"log"
 
 	"github.com/aktsk/ipa-medit/pkg/idevice"
 	"github.com/aktsk/ipa-medit/pkg/lldb"
 )
-
 
 func runApp(binPath string, bundleID string) error {
 	// The device app path reported by the device might be stale, so retry
@@ -36,9 +35,9 @@ func runApp(binPath string, bundleID string) error {
 func runMain() error {
 	var binPath string
 	var bundleID string
-    flag.StringVar(&binPath, "bin", "", "ios app binary that can unzip and extract .ipa")
+	flag.StringVar(&binPath, "bin", "", "ios app binary that can unzip and extract .ipa")
 	flag.StringVar(&bundleID, "id", "", "bundle id")
-    flag.Parse()
+	flag.Parse()
 
 	if binPath == "" {
 		return errors.New("bin option is required")
@@ -48,8 +47,8 @@ func runMain() error {
 		return errors.New("id option is required")
 	}
 
-	udid, err := idevice.Init();
-	if  err != nil {
+	udid, err := idevice.Init()
+	if err != nil {
 		return err
 	}
 	fmt.Printf("Target device's UDID: %s\n", udid)
