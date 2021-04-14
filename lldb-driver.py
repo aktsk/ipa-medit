@@ -63,8 +63,12 @@ def run_prompt(target, listener, debugger):
                 continue
             if state != lldb.eStateStopped:
                 attach(target, listener)
-            value = int(input_text_list[1])
-            addr_cache = start_search_process(target, value)
+            if input_text_list[1] == 'all':
+                value = int(input_text_list[2])
+                addr_cache = start_search_process(target, value, 'all')
+            else:
+                value = int(input_text_list[1])
+                addr_cache = start_search_process(target, value)
         elif cmd == 'filter':
             if len(input_text_list) < 2:
                 print('Target value cannot be specified.')
@@ -131,7 +135,7 @@ def lldb_exit(target, debugger):
     sys.exit()
 
 
-def start_search_process(target, pattern):
+def start_search_process(target, pattern, scope='integer'):
     start = time.time()
     process = target.GetProcess()
     memory_regions = process.GetMemoryRegions()
@@ -144,37 +148,60 @@ def start_search_process(target, pattern):
     int_pattern_lengh = len(int_pattern)
     int_hash = pow(16777619, int_pattern_lengh - 1) % 999999937
 
-    string_pattern, string_type = int_to_byte(pattern, 'string')
-    string_pattern_lengh = len(int_pattern)
-    string_hash = pow(16777619, int_pattern_lengh - 1) % 999999937
-
     search_jobs = []
-    for i in range(memory_regions_size):
-        memory_region_info = lldb.SBMemoryRegionInfo()
-        success = memory_regions.GetMemoryRegionAtIndex(i, memory_region_info)
-        if success:
-            begin_addr, end_addr = parse_memory_region(memory_region_info)
-            if (begin_addr is not None) and (end_addr is not None):
-                if begin_addr < 0x1d0000000:
-                    print('Scanning: 0x{:016x}-0x{:016x}'.format(begin_addr, end_addr))
-                    err = lldb.SBError()
-                    memory_length = end_addr - begin_addr
-                    memory_bytes = process.ReadMemory(begin_addr, memory_length, err)
-                    if err.Success():
-                        search_int_process = multiprocessing.Process(target=find_bytes_memory_region, args=(
-                            memory_bytes, begin_addr, memory_length, int_pattern, int_pattern_lengh, int_hash, int_type,
-                            manager_list))
-                        search_int_process.start()
-                        search_jobs.append(search_int_process)
-                        search_string_process = multiprocessing.Process(target=find_bytes_memory_region, args=(
-                            memory_bytes, begin_addr, memory_length, string_pattern, string_pattern_lengh, string_hash, string_type,
-                            manager_list))
-                        search_string_process.start()
-                        search_jobs.append(search_string_process)
-                    if len(manager_list) > 500000:
-                        print('Too many addresses with target data found...')
-                        [j.join() for j in search_jobs]
-                        return manager_list
+    if scope == 'integer':
+         for i in range(memory_regions_size):
+            memory_region_info = lldb.SBMemoryRegionInfo()
+            success = memory_regions.GetMemoryRegionAtIndex(i, memory_region_info)
+            if success:
+                begin_addr, end_addr = parse_memory_region(memory_region_info)
+                if (begin_addr is not None) and (end_addr is not None):
+                    if begin_addr < 0x1d0000000:
+                        print('Scanning: 0x{:016x}-0x{:016x}'.format(begin_addr, end_addr))
+                        err = lldb.SBError()
+                        memory_length = end_addr - begin_addr
+                        memory_bytes = process.ReadMemory(begin_addr, memory_length, err)
+                        if err.Success():
+                            search_int_process = multiprocessing.Process(target=find_bytes_memory_region, args=(
+                                memory_bytes, begin_addr, memory_length, int_pattern, int_pattern_lengh, int_hash, int_type,
+                                manager_list))
+                            search_int_process.start()
+                            search_jobs.append(search_int_process)
+                        if len(manager_list) > 500000:
+                            print('Too many addresses with target data found...')
+                            [j.join() for j in search_jobs]
+                            return manager_list
+    
+    elif scope == 'all':
+        string_pattern, string_type = int_to_byte(pattern, 'string')
+        string_pattern_lengh = len(int_pattern)
+        string_hash = pow(16777619, int_pattern_lengh - 1) % 999999937
+        for i in range(memory_regions_size):
+            memory_region_info = lldb.SBMemoryRegionInfo()
+            success = memory_regions.GetMemoryRegionAtIndex(i, memory_region_info)
+            if success:
+                begin_addr, end_addr = parse_memory_region(memory_region_info)
+                if (begin_addr is not None) and (end_addr is not None):
+                    if begin_addr < 0x1d0000000:
+                        print('Scanning: 0x{:016x}-0x{:016x}'.format(begin_addr, end_addr))
+                        err = lldb.SBError()
+                        memory_length = end_addr - begin_addr
+                        memory_bytes = process.ReadMemory(begin_addr, memory_length, err)
+                        if err.Success():
+                            search_int_process = multiprocessing.Process(target=find_bytes_memory_region, args=(
+                                memory_bytes, begin_addr, memory_length, int_pattern, int_pattern_lengh, int_hash, int_type,
+                                manager_list))
+                            search_int_process.start()
+                            search_jobs.append(search_int_process)
+                            search_string_process = multiprocessing.Process(target=find_bytes_memory_region, args=(
+                                memory_bytes, begin_addr, memory_length, string_pattern, string_pattern_lengh, string_hash, string_type,
+                                manager_list))
+                            search_string_process.start()
+                            search_jobs.append(search_string_process)
+                        if len(manager_list) > 500000:
+                            print('Too many addresses with target data found...')
+                            [j.join() for j in search_jobs]
+                            return manager_list
 
     [j.join() for j in search_jobs]
     elapsed_time = time.time() - start
