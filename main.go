@@ -35,7 +35,7 @@ func runApp(binPath string, bundleID string) error {
 func runMain() error {
 	var binPath string
 	var bundleID string
-	flag.StringVar(&binPath, "bin", "", "ios app binary that can unzip and extract .ipa")
+	flag.StringVar(&binPath, "bin", "", "ios app binary that unzip and extract from .ipa")
 	flag.StringVar(&bundleID, "id", "", "bundle id")
 	flag.Parse()
 

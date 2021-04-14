@@ -144,6 +144,10 @@ def start_search_process(target, pattern):
     int_pattern_lengh = len(int_pattern)
     int_hash = pow(16777619, int_pattern_lengh - 1) % 999999937
 
+    string_pattern, string_type = int_to_byte(pattern, 'string')
+    string_pattern_lengh = len(int_pattern)
+    string_hash = pow(16777619, int_pattern_lengh - 1) % 999999937
+
     search_jobs = []
     for i in range(memory_regions_size):
         memory_region_info = lldb.SBMemoryRegionInfo()
@@ -157,11 +161,16 @@ def start_search_process(target, pattern):
                     memory_length = end_addr - begin_addr
                     memory_bytes = process.ReadMemory(begin_addr, memory_length, err)
                     if err.Success():
-                        search_process = multiprocessing.Process(target=find_bytes_memory_region, args=(
+                        search_int_process = multiprocessing.Process(target=find_bytes_memory_region, args=(
                             memory_bytes, begin_addr, memory_length, int_pattern, int_pattern_lengh, int_hash, int_type,
                             manager_list))
-                        search_jobs.append(search_process)
-                        search_process.start()
+                        search_int_process.start()
+                        search_jobs.append(search_int_process)
+                        search_string_process = multiprocessing.Process(target=find_bytes_memory_region, args=(
+                            memory_bytes, begin_addr, memory_length, string_pattern, string_pattern_lengh, string_hash, string_type,
+                            manager_list))
+                        search_string_process.start()
+                        search_jobs.append(search_string_process)
                     if len(manager_list) > 500000:
                         print('Too many addresses with target data found...')
                         [j.join() for j in search_jobs]
@@ -188,7 +197,6 @@ def parse_memory_region(memory_region_info):
 
 def find_bytes_memory_region(memory_bytes, base_addr, memory_length, search_pattern, search_pattern_length, search_hash,
                              search_type, manager_list):
-    # search int
     memory_region_index = find_all_bytes_by_rabin_karp(memory_bytes, memory_length, search_pattern,
                                                        search_pattern_length, search_hash)
     search_result = list(map(lambda x: (base_addr + x, search_type), memory_region_index))
@@ -238,6 +246,8 @@ def int_to_byte(integer, int_type):
         return struct.pack('1I', integer), 'uint32'
     elif int_type == 'uint64':
         return struct.pack('1Q', integer), 'uint64'
+    elif int_type == 'string':
+        return bytes(str(integer), encoding="UTF-8"), 'string'
 
 
 def patch(process, search_pattern, addr_cache):
