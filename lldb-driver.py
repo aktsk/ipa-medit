@@ -64,27 +64,45 @@ def run_prompt(target, listener, debugger):
             if state != lldb.eStateStopped:
                 attach(target, listener)
             if input_text_list[1] == 'all':
-                value = int(input_text_list[2])
-                addr_cache = start_search_process(target, value, 'all')
+                # UTF-8 string + unsigned integer
+                try:
+                    value = int(input_text_list[2])
+                    addr_cache = start_search_process(target, value, 'all')
+                except ValueError:
+                    print('Target value is not integer.')
+                    continue
             else:
-                value = int(input_text_list[1])
-                addr_cache = start_search_process(target, value)
+                # unsigned integer only
+                try:
+                    value = int(input_text_list[1])
+                    addr_cache = start_search_process(target, value)
+                except ValueError:
+                    print('Target value is not integer.')
+                    continue
         elif cmd == 'filter':
             if len(input_text_list) < 2:
                 print('Target value cannot be specified.')
                 continue
-            if state != lldb.eStateStopped:
-                attach(target, listener)
-            value = int(input_text_list[1])
-            addr_cache = filter_addr(process, value, addr_cache)
+            try:
+                value = int(input_text_list[1])
+                if state != lldb.eStateStopped:
+                    attach(target, listener)
+                addr_cache = filter_addr(process, value, addr_cache)
+            except ValueError:
+                print('Target value is not integer.')
+                continue
         elif cmd == 'patch':
             if len(input_text_list) < 2:
                 print('Target value cannot be specified.')
                 continue
-            if state != lldb.eStateStopped:
-                attach(target, listener)
-            value = int(input_text_list[1])
-            patch(process, value, addr_cache)
+            try:
+                value = int(input_text_list[1])
+                if state != lldb.eStateStopped:
+                    attach(target, listener)
+                patch(process, value, addr_cache)
+            except ValueError:
+                print('Target value is not integer.')
+                continue
         elif cmd == 'exit':
             print('Bye!')
             lldb_exit(target, debugger)

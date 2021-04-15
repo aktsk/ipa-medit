@@ -27,9 +27,17 @@ $ brew install --HEAD ideviceinstaller
 
 ## Installation
 
+```
+$ go install github.com/aktsk/ipa-medit
+```
 
 ## Usage
+To launch it, specify the executable file path contained in the .ipa file for `-bin` and the bundle id for `-id`.
 
+```
+$ unzip tap1000000.ipa
+$ ipa-medit -bin="./Payload/tap1000000.app/tap1000000" -id="jp.hoge.tap1000000"
+```
 
 ### Commands
 Here are the commands available in an interactive prompt.
@@ -50,6 +58,13 @@ Scanning: 0x000000016ebec000-0x000000016ec74000
 Scanning: 0x000000016ec78000-0x000000016ed00000
 Found: 1!!
 Address: 0x10a2feea0
+```
+
+By default, only integer types are searched.
+If you want to search for strings as well, add "all" and specify the arguments as follows:
+
+```
+> find all 999986
 ```
 
 #### filter
