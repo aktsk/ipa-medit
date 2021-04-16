@@ -28,7 +28,7 @@ $ brew install --HEAD ideviceinstaller
 ## Installation
 
 ```
-$ go install github.com/aktsk/ipa-medit
+$ go install github.com/aktsk/ipa-medit@latest
 ```
 
 ## Usage
