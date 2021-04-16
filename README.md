@@ -148,7 +148,7 @@ Success to continue process
 ```
 
 #### exit
-To exit medit, use the exit command.
+To exit medit, use the `exit` command or `Ctrl-D`.
 
 ```
 > exit

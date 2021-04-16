@@ -9,7 +9,7 @@ import (
 	"syscall"
 )
 
-func RunLLDB(platform, appdir, deviceAppPath string) ([]byte, error) {
+func RunLLDB(platform, binPath, deviceAppPath string) ([]byte, error) {
 	var env []string
 	for _, e := range os.Environ() {
 		env = append(env, e)
@@ -19,18 +19,16 @@ func RunLLDB(platform, appdir, deviceAppPath string) ([]byte, error) {
 		"python3",
 		"./lldb-driver.py",
 		platform,
-		appdir,
+		binPath,
 		deviceAppPath,
 	)
 	lldb.Env = env
 	lldb.Stdin = os.Stdin
 	lldb.Stdout = os.Stdout
-	var out bytes.Buffer
-	lldb.Stderr = io.MultiWriter(&out, os.Stderr)
+	var stderr bytes.Buffer
+	lldb.Stderr = io.MultiWriter(&stderr, os.Stderr)
 	err := lldb.Start()
 	if err == nil {
-		//time.Sleep(5 * time.Second)
-		//lldb.Stdin = os.Stdin
 		// Forward SIGQUIT to the lldb driver which in turn will forward
 		// to the running program.
 		sigs := make(chan os.Signal, 1)
@@ -45,5 +43,5 @@ func RunLLDB(platform, appdir, deviceAppPath string) ([]byte, error) {
 		signal.Stop(sigs)
 		close(sigs)
 	}
-	return out.Bytes(), err
+	return stderr.Bytes(), err
 }

@@ -1,11 +1,11 @@
 package main
 
 import (
-	"bytes"
 	"errors"
 	"flag"
 	"fmt"
 	"log"
+	"unsafe"
 
 	"github.com/aktsk/ipa-medit/pkg/idevice"
 	"github.com/aktsk/ipa-medit/pkg/lldb"
@@ -22,12 +22,12 @@ func runApp(binPath string, bundleID string) error {
 	fmt.Printf("Target local bin: %s\n", binPath)
 	platform := "remote-ios"
 	fmt.Printf("Target platform: %s\n", platform)
-	out, err := lldb.RunLLDB(platform, binPath, deviceAppPath)
-	// If the program was not started it can be retried without papering over
-	// real test failures.
-	started := bytes.HasPrefix(out, []byte("lldb: running program"))
-	if started || err == nil {
+	stderr, err := lldb.RunLLDB(platform, binPath, deviceAppPath)
+	if err == nil {
 		return err
+	}
+	if len(stderr) != 0 {
+		return errors.New(*(*string)(unsafe.Pointer(&stderr)))
 	}
 	return nil
 }
@@ -35,8 +35,8 @@ func runApp(binPath string, bundleID string) error {
 func runMain() error {
 	var binPath string
 	var bundleID string
-	flag.StringVar(&binPath, "bin", "", "ios app binary that unzip and extract from .ipa")
-	flag.StringVar(&bundleID, "id", "", "bundle id")
+	flag.StringVar(&binPath, "bin", "", "specify ios app binary that unzip and extract from .ipa")
+	flag.StringVar(&bundleID, "id", "", "specify bundle id")
 	flag.Parse()
 
 	if binPath == "" {

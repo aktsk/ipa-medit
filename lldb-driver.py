@@ -6,7 +6,6 @@ import os
 import signal
 import struct
 import sys
-import time
 
 platform, local_bin, device_bin_or_pid = sys.argv[1], sys.argv[2], sys.argv[3]
 
@@ -33,81 +32,88 @@ def run_program(target):
     # Tell the Go driver that the program is running and should not be retried.
     process = target.GetProcess()
     process.Continue()
-    print('lldb: running program....')
+    print('lldb: starting program...')
 
 
 def run_prompt(target, listener, debugger):
     addr_cache = []
     process = target.GetProcess()
     while True:
-        input_text = input('\033[1m\033[34m> \033[36m')
-        print('\033[0m', end='')  # reset color
-        input_text_list = input_text.split(' ')
-        cmd = input_text_list[0]
-        state = process.GetState()
-        if cmd == 'attach':
-            if state == lldb.eStateStopped:
-                print('Already attached...')
-            else:
-                attach(target, listener)
-        elif cmd == 'detach':
-            if state == lldb.eStateRunning:
-                print('Already detached.')
-            else:
-                detach(target, listener)
-        elif cmd == 'ps':
-            info(target)
-        elif cmd == 'find':
-            if len(input_text_list) < 2:
-                print('Target value cannot be specified.')
-                continue
-            if state != lldb.eStateStopped:
-                attach(target, listener)
-            if input_text_list[1] == 'all':
-                # UTF-8 string + unsigned integer
-                try:
-                    value = int(input_text_list[2])
-                    addr_cache = start_search_process(target, value, 'all')
-                except ValueError:
-                    print('Target value is not integer.')
+        try:
+            input_text = input('\033[1m\033[34m> \033[36m')
+            print('\033[0m', end='') # reset color
+            input_text_list = input_text.split(' ')
+            cmd = input_text_list[0]
+            state = process.GetState()
+            if cmd == 'attach':
+                if state == lldb.eStateStopped:
+                    print('Already attached...')
+                else:
+                    attach(target, listener)
+            elif cmd == 'detach':
+                if state == lldb.eStateRunning:
+                    print('Already detached.')
+                else:
+                    detach(target, listener)
+            elif cmd == 'ps':
+                info(target)
+            elif cmd == 'find':
+                if len(input_text_list) < 2:
+                    print('Target value cannot be specified.')
                     continue
-            else:
-                # unsigned integer only
+                if state != lldb.eStateStopped:
+                    attach(target, listener)
+                if input_text_list[1] == 'all':
+                    # UTF-8 string + unsigned integer
+                    try:
+                        value = int(input_text_list[2])
+                        addr_cache = start_search_process(target, value, 'all')
+                    except ValueError:
+                        print('Target value is not integer.')
+                        continue
+                else:
+                    # unsigned integer only
+                    try:
+                        value = int(input_text_list[1])
+                        addr_cache = start_search_process(target, value)
+                    except ValueError:
+                        print('Target value is not integer.')
+                        continue
+            elif cmd == 'filter':
+                if len(input_text_list) < 2:
+                    print('Target value cannot be specified.')
+                    continue
                 try:
                     value = int(input_text_list[1])
-                    addr_cache = start_search_process(target, value)
+                    if state != lldb.eStateStopped:
+                        attach(target, listener)
+                    addr_cache = filter_addr(process, value, addr_cache)
                 except ValueError:
                     print('Target value is not integer.')
                     continue
-        elif cmd == 'filter':
-            if len(input_text_list) < 2:
-                print('Target value cannot be specified.')
-                continue
-            try:
-                value = int(input_text_list[1])
-                if state != lldb.eStateStopped:
-                    attach(target, listener)
-                addr_cache = filter_addr(process, value, addr_cache)
-            except ValueError:
-                print('Target value is not integer.')
-                continue
-        elif cmd == 'patch':
-            if len(input_text_list) < 2:
-                print('Target value cannot be specified.')
-                continue
-            try:
-                value = int(input_text_list[1])
-                if state != lldb.eStateStopped:
-                    attach(target, listener)
-                patch(process, value, addr_cache)
-            except ValueError:
-                print('Target value is not integer.')
-                continue
-        elif cmd == 'exit':
+            elif cmd == 'patch':
+                if len(input_text_list) < 2:
+                    print('Target value cannot be specified.')
+                    continue
+                try:
+                    value = int(input_text_list[1])
+                    if state != lldb.eStateStopped:
+                        attach(target, listener)
+                    patch(process, value, addr_cache)
+                except ValueError:
+                    print('Target value is not integer.')
+                    continue
+            elif cmd == 'exit':
+                print('Bye!')
+                lldb_exit(target, debugger)
+            else:
+                print('Command not found...')
+
+        except EOFError:
+            print('\033[0m') # reset color
             print('Bye!')
             lldb_exit(target, debugger)
-        else:
-            print('Command not found...')
+
 
 
 def info(target):
@@ -154,7 +160,6 @@ def lldb_exit(target, debugger):
 
 
 def start_search_process(target, pattern, scope='integer'):
-    start = time.time()
     process = target.GetProcess()
     memory_regions = process.GetMemoryRegions()
     memory_regions_size = memory_regions.GetSize()
@@ -222,8 +227,6 @@ def start_search_process(target, pattern, scope='integer'):
                             return manager_list
 
     [j.join() for j in search_jobs]
-    elapsed_time = time.time() - start
-    print('elapsed_time:{0}'.format(elapsed_time) + '[sec]')
     print('Found: {0}!!'.format(len(manager_list)))
     if len(manager_list) < 10:
         for addr, _ in manager_list:
