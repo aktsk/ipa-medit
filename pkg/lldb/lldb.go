@@ -2,7 +2,6 @@ package lldb
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"os"
 	"os/exec"
@@ -15,7 +14,7 @@ var pyPath string
 
 func fileExists(filepath string) bool {
     _, err := os.Stat(filepath)
-    return os.IsExist(err)
+    return err == nil
 }
 
 func PreparePythonFile() error {
@@ -25,7 +24,6 @@ func PreparePythonFile() error {
 	}
 	pyPath = filepath.Join(filepath.Dir(exePath), "lldb-driver.py")
 	if !fileExists(pyPath) {
-		fmt.Println("aaa")
 		fp, err := os.Create(pyPath)
 		if err != nil {
 			return err
