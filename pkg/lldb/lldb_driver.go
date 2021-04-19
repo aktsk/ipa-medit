@@ -1,3 +1,6 @@
+// Based on Go on iOS(https://github.com/golang/go/blob/master/misc/ios/go_ios_exec.go)
+// The license of Go on iOS can be checked in the CREDITS file.
+
 package lldb
 
 const pythonData string = `
