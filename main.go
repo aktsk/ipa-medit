@@ -47,6 +47,10 @@ func runMain() error {
 		return errors.New("id option is required")
 	}
 
+    if err := lldb.PreparePythonFile(); err != nil {
+		return err
+	}
+
 	udid, err := idevice.Init()
 	if err != nil {
 		return err

@@ -2,12 +2,38 @@ package lldb
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"os"
 	"os/exec"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 )
+
+var pyPath string
+
+func fileExists(filepath string) bool {
+    _, err := os.Stat(filepath)
+    return os.IsExist(err)
+}
+
+func PreparePythonFile() error {
+	exePath, err := os.Executable()
+	if err != nil {
+		return err
+	}
+	pyPath = filepath.Join(filepath.Dir(exePath), "lldb-driver.py")
+	if !fileExists(pyPath) {
+		fmt.Println("aaa")
+		fp, err := os.Create(pyPath)
+		if err != nil {
+			return err
+		}
+		fp.WriteString(pythonData)
+	}
+	return nil
+}
 
 func RunLLDB(platform, binPath, deviceAppPath string) ([]byte, error) {
 	var env []string
@@ -17,7 +43,7 @@ func RunLLDB(platform, binPath, deviceAppPath string) ([]byte, error) {
 	lldb := exec.Command(
 		"xcrun",
 		"python3",
-		"./lldb-driver.py",
+		pyPath,
 		platform,
 		binPath,
 		deviceAppPath,
