@@ -1,4 +1,8 @@
 # ipa-medit
+
+[![GitHub release](https://img.shields.io/github/v/release/aktsk/apk-medit.svg)](https://github.com/aktsk/ipa-medit/releases/latest)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/aktsk/ipa-medit/blob/master/LICENSE)
+
 Ipa-medit is a memory search and patch tool for resigned ipa without jailbreak. It was created for mobile game security testing.
 
 ## Motivation
@@ -26,6 +30,11 @@ $ brew install --HEAD ideviceinstaller
 ```
 
 ## Installation
+### Binary
+Download the binary from [GitHub Releases](https://github.com/aktsk/ipa-medit/releases/) and drop it in your $PATH.
+
+### Manually Build
+You need Go compiler.
 
 ```
 $ go install github.com/aktsk/ipa-medit@latest
