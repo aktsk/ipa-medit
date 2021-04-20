@@ -16,8 +16,8 @@ import (
 var pyPath string
 
 func fileExists(filepath string) bool {
-    _, err := os.Stat(filepath)
-    return err == nil
+	_, err := os.Stat(filepath)
+	return err == nil
 }
 
 func PreparePythonFile() error {

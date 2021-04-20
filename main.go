@@ -47,7 +47,7 @@ func runMain() error {
 		return errors.New("id option is required")
 	}
 
-    if err := lldb.PreparePythonFile(); err != nil {
+	if err := lldb.PreparePythonFile(); err != nil {
 		return err
 	}
 
