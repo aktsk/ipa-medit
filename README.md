@@ -48,6 +48,14 @@ $ unzip tap1000000.ipa
 $ ipa-medit -bin="./Payload/tap1000000.app/tap1000000" -id="jp.hoge.tap1000000"
 ```
 
+The target .ipa file must be signed with a certificate installed on your computer. 
+If you want to perform memory tampering on third-party applications, please use a tool such as [ipautil](https://github.com/aktsk/ipautil) to perform the resigning.
+
+```
+$ ipautil decode tap1000000.ipa # unzip
+$ ipautil build Payload         # resign and generate .ipa file
+```
+
 ### Commands
 Here are the commands available in an interactive prompt.
 
