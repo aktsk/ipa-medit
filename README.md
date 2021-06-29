@@ -2,6 +2,7 @@
 
 [![GitHub release](https://img.shields.io/github/v/release/aktsk/ipa-medit.svg)](https://github.com/aktsk/ipa-medit/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/aktsk/ipa-medit/blob/master/LICENSE)
+[![](https://img.shields.io/badge/Black%20Hat%20Arsenal-USA%202021-blue.svg)](https://www.blackhat.com/us-21/arsenal/schedule/index.html#ipa-medit-memory-search-and-patch-tool-for-ipa-without-jailbreaking-24072)
 ![](https://github.com/aktsk/ipa-medit/workflows/test/badge.svg)
 
 Ipa-medit is a memory search and patch tool for resigned ipa without jailbreak. It was created for mobile game security testing.
@@ -50,11 +51,11 @@ $ ipa-medit -bin="./Payload/tap1000000.app/tap1000000" -id="jp.hoge.tap1000000"
 ```
 
 The target .ipa file must be signed with a certificate installed on your computer. 
-If you want to perform memory tampering on third-party applications, please use a tool such as [ipautil](https://github.com/aktsk/ipautil) to perform the resigning.
+If you want to modify memory on third-party applications, please use a tool such as [ipautil](https://github.com/aktsk/ipautil) for re-signing.
 
 ```
 $ ipautil decode tap1000000.ipa # unzip
-$ ipautil build Payload         # resign and generate .ipa file
+$ ipautil build Payload         # re-sign and generate .ipa file
 ```
 
 ### Commands
