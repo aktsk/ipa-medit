@@ -175,8 +175,12 @@ Bye!
 ```
 
 ## Trouble shooting
-### failed to get reply to handshake packet
+### Failed to get reply to handshake packet
 If you get the error `/private/var/containers/Bundle/Application/XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX/hoge.app: error: failed to get reply to handshake packet` and can't communicate properly with iOS device and lldb, launch Xcode and build some app, and it will work.
+
+### Could not connect to lockdownd
+If you get the error `Could not connect to lockdownd.` and can't communicate properly with iOS device and ideviceinstaller, launch Xcode and build some app, and it will work.
+If this does not solve the problem, please update ideviceinstaller and libimobiledevice to the latest versions using the example of commands in the Requirements section.
 
 ### Could not start com.apple.debugserver
 This can be fixed by installing the latest unversioned code of libimobiledevice and ideviceinstaller by adding the `--HEAD` option when doing `brew install`.
