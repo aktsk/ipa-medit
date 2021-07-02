@@ -172,12 +172,12 @@ def start_search_process(target, pattern, scope='integer'):
 
     manager = multiprocessing.Manager()
     manager_list = manager.list()
+    search_params = []
 
     int_pattern, int_type = int_to_byte(pattern, None)
     int_pattern_lengh = len(int_pattern)
     int_hash = pow(16777619, int_pattern_lengh - 1) % 999999937
 
-    search_jobs = []
     if scope == 'integer':
          for i in range(memory_regions_size):
             memory_region_info = lldb.SBMemoryRegionInfo()
@@ -191,15 +191,9 @@ def start_search_process(target, pattern, scope='integer'):
                         memory_length = end_addr - begin_addr
                         memory_bytes = process.ReadMemory(begin_addr, memory_length, err)
                         if err.Success():
-                            search_int_process = multiprocessing.Process(target=find_bytes_memory_region, args=(
-                                memory_bytes, begin_addr, memory_length, int_pattern, int_pattern_lengh, int_hash, int_type,
-                                manager_list))
-                            search_int_process.start()
-                            search_jobs.append(search_int_process)
-                        if len(manager_list) > 500000:
-                            print('Too many addresses with target data found...')
-                            [j.join() for j in search_jobs]
-                            return manager_list
+                            search_params.append(
+                                (memory_bytes, begin_addr, memory_length, int_pattern, int_pattern_lengh, int_hash, int_type, manager_list)
+                            )
     
     elif scope == 'all':
         string_pattern, string_type = int_to_byte(pattern, 'string')
@@ -217,22 +211,14 @@ def start_search_process(target, pattern, scope='integer'):
                         memory_length = end_addr - begin_addr
                         memory_bytes = process.ReadMemory(begin_addr, memory_length, err)
                         if err.Success():
-                            search_int_process = multiprocessing.Process(target=find_bytes_memory_region, args=(
-                                memory_bytes, begin_addr, memory_length, int_pattern, int_pattern_lengh, int_hash, int_type,
-                                manager_list))
-                            search_int_process.start()
-                            search_jobs.append(search_int_process)
-                            search_string_process = multiprocessing.Process(target=find_bytes_memory_region, args=(
-                                memory_bytes, begin_addr, memory_length, string_pattern, string_pattern_lengh, string_hash, string_type,
-                                manager_list))
-                            search_string_process.start()
-                            search_jobs.append(search_string_process)
-                        if len(manager_list) > 500000:
-                            print('Too many addresses with target data found...')
-                            [j.join() for j in search_jobs]
-                            return manager_list
+                            search_params.append(
+                                (memory_bytes, begin_addr, memory_length, int_pattern, int_pattern_lengh, int_hash, int_type, manager_list)
+                            )
 
-    [j.join() for j in search_jobs]
+    print('Searching...')
+    with multiprocessing.Pool(processes=multiprocessing.cpu_count()) as pool:
+        pool.starmap(find_bytes_memory_region, search_params)
+
     print('Found: {0}!!'.format(len(manager_list)))
     if len(manager_list) < 10:
         for addr, _ in manager_list:
