@@ -9,6 +9,7 @@ import (
 
 	"github.com/aktsk/ipa-medit/pkg/idevice"
 	"github.com/aktsk/ipa-medit/pkg/lldb"
+	"github.com/aktsk/ipa-medit/pkg/prompt"
 )
 
 func runApp(binPath string, bundleID string) error {
@@ -35,9 +36,18 @@ func runApp(binPath string, bundleID string) error {
 func runMain() error {
 	var binPath string
 	var bundleID string
+	var pid string
 	flag.StringVar(&binPath, "bin", "", "specify ios app binary that unzip and extract from .ipa")
 	flag.StringVar(&bundleID, "id", "", "specify bundle id")
+	flag.StringVar(&pid, "pid", "", "specify pid running on the Apple Silicon Mac")
 	flag.Parse()
+
+	if pid != "" {
+		fmt.Println("Please use `exit` or `Ctrl-D` to exit this program.")
+		fmt.Printf("Target PID has been set to %s.\n", pid)
+		prompt.RunPrompt(pid)
+		return nil
+	}
 
 	if binPath == "" {
 		return errors.New("bin option is required")
@@ -71,6 +81,7 @@ func runMain() error {
 }
 
 func main() {
+	defer prompt.HandleExit()
 	err := runMain()
 	if err != nil {
 		log.Fatalf("%v\n", err)
