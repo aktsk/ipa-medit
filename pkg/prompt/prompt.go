@@ -5,13 +5,16 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"runtime"
+	"strings"
 
 	prompt "github.com/c-bata/go-prompt"
 
-	"github.com/aktsk/ipa-medit/pkg/cmd"
+	"github.com/aktsk/ipa-medit/cmd"
 )
 
 var appPID string
+var addrCache []cmd.Found
 
 func HandleExit() {
 	rawModeOff := exec.Command("/bin/stty", "-raw", "echo")
@@ -21,12 +24,46 @@ func HandleExit() {
 }
 
 func executor(in string) {
-	if in == "find" {
-		//inputSlice := strings.Split(in, " ")
-		//targetVal := inputSlice[1]
-		if _, err := cmd.Find(appPID); err != nil {
+	if strings.HasPrefix(in, "find") {
+		inputSlice := strings.Split(in, " ")
+		dataType := "all"
+		targetVal := inputSlice[1]
+		if len(inputSlice) < 1 {
+			fmt.Println("Target value cannot be specified.")
+			return
+		}
+		if len(inputSlice) == 3 {
+			targetVal = inputSlice[2]
+			dataType = inputSlice[1]
+		}
+		if foundAddr, err := cmd.Find(appPID, targetVal, dataType); err == nil {
+			addrCache = foundAddr
+		}
+
+	} else if strings.HasPrefix(in, "patch") {
+		slice := strings.Split(in, " ")
+		if len(slice) == 1 {
+			fmt.Println("Target value cannot be specified.")
+			return
+		}
+
+		err := cmd.Patch(appPID, slice[1], addrCache)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+	} else if in == "attach" {
+		if err := cmd.Attach(appPID); err != nil {
+			HandleExit()
 			log.Fatal(err)
 		}
+
+	} else if in == "detach" {
+		if err := cmd.Detach(appPID); err != nil {
+			HandleExit()
+			log.Fatal(err)
+		}
+
 	} else if in == "exit" || in == "quit" {
 		fmt.Println("Bye!")
 		HandleExit()
@@ -55,6 +92,10 @@ func completer(t prompt.Document) []prompt.Suggest {
 }
 
 func RunPrompt(pid string) {
+	// for ptrace attach
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
+
 	appPID = pid
 	p := prompt.New(
 		executor,

@@ -1,9 +1,9 @@
 package memory
 
 import (
+	"io/ioutil"
 	"reflect"
 	"testing"
-	"io/ioutil"
 )
 
 func TestGetWritableAddrRanges(t *testing.T) {
@@ -20,5 +20,27 @@ func TestGetWritableAddrRanges(t *testing.T) {
 	expectedLastRange := [2]int{105553518919680, 105553653137408}
 	if !reflect.DeepEqual(actualLastRange, expectedLastRange) {
 		t.Errorf("got last address range: %v\nexpected last address range: %v", actualLastRange, expectedLastRange)
+	}
+}
+
+func TestFindDataInSplittedMemory(t *testing.T) {
+	memory := []byte{0x10, 0x11, 0x12, 0x10, 0x10, 0x11, 0x12, 0x11, 0x10, 0x11, 0x12, 0x12}
+	searchBytes := []byte{0x10, 0x11, 0x12}
+	actual := []int{}
+	findDataInSplittedMemory(&memory, searchBytes, len(searchBytes), 0x100, 0, &actual)
+	expected := []int{0x100, 0x104, 0x108}
+	if !reflect.DeepEqual(actual, expected) {
+		t.Errorf("got addr slice: %v\nexpected addr slice: %v", actual, expected)
+	}
+}
+
+func TestFindEmptyInSplittedMemory(t *testing.T) {
+	memory := []byte{0x10}
+	searchBytes := []byte{0xAA, 0xBB, 0xCC}
+	actual := []int{}
+	findDataInSplittedMemory(&memory, searchBytes, len(searchBytes), 0x100, 0, &actual)
+	expected := []int{}
+	if !reflect.DeepEqual(actual, expected) {
+		t.Errorf("got addr slice: %v\nexpected addr slice: %v", actual, expected)
 	}
 }
