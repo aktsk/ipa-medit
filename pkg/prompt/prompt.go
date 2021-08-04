@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
+	"strconv"
 	"strings"
 
 	prompt "github.com/c-bata/go-prompt"
@@ -39,6 +40,23 @@ func executor(in string) {
 		if foundAddr, err := cmd.Find(appPID, targetVal, dataType); err == nil {
 			addrCache = foundAddr
 		}
+	
+	} else if strings.HasPrefix(in, "filter") {
+		if len(addrCache) == 0 {
+			fmt.Println("No previous results. ")
+			return
+		}
+		slice := strings.Split(in, " ")
+		if len(slice) == 1 {
+			fmt.Println("Target value cannot be specified.")
+			return
+		}
+
+		foundAddr, err := cmd.Filter(appPID, slice[1], addrCache)
+		if err != nil {
+			fmt.Println(err)
+		}
+		addrCache = foundAddr
 
 	} else if strings.HasPrefix(in, "patch") {
 		slice := strings.Split(in, " ")
@@ -64,6 +82,24 @@ func executor(in string) {
 			log.Fatal(err)
 		}
 
+	} else if strings.HasPrefix(in, "dump") {
+		inputSlice := strings.Split(in, " ")
+		beginAddr, err := parseAddr(inputSlice[1])
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		endAddr, err := parseAddr(inputSlice[2])
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		if err := cmd.Dump(appPID, beginAddr, endAddr); err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
 	} else if in == "exit" || in == "quit" {
 		fmt.Println("Bye!")
 		HandleExit()
@@ -85,7 +121,6 @@ func completer(t prompt.Document) []prompt.Suggest {
 		{Text: "patch  <int>", Description: "Write the specified value on the address found by search."},
 		{Text: "attach", Description: "Attach to the target process by ptrace."},
 		{Text: "detach", Description: "Detach from the attached process."},
-		{Text: "ps", Description: "Find the target process and if there is only one, specify it as the target."},
 		{Text: "dump <begin addr> <end addr>", Description: "Display memory dump like hexdump"},
 		{Text: "exit"},
 	}
@@ -108,4 +143,17 @@ func RunPrompt(pid string) {
 		prompt.OptionDescriptionTextColor(prompt.DarkGray),
 	)
 	p.Run()
+}
+
+func parseAddr(arg string) (int, error) {
+	arg = strings.Replace(arg, "0x", "", 1)
+	address, err := strconv.ParseInt(arg, 16, 64)
+	if err == nil {
+		return int(address), nil
+	}
+	address, err = strconv.ParseInt(arg, 10, 64)
+	if err == nil {
+		return int(address), nil
+	}
+	return 0, err
 }

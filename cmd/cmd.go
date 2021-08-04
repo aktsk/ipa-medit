@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"os/exec"
@@ -35,7 +36,7 @@ func Find(pid string, targetVal string, dataType string) ([]Found, error) {
 	
 	if dataType == "all" {
 		// search string
-		foundAddrs, err := memory.FindString(targetVal, addrRanges, intPid)
+		foundAddrs, err := memory.FindString(intPid, targetVal, addrRanges)
 		if err == nil && len(foundAddrs) > 0 {
 			founds = append(founds, Found{
 				addrs:     foundAddrs,
@@ -48,7 +49,7 @@ func Find(pid string, targetVal string, dataType string) ([]Found, error) {
 		fmt.Println("------------------------")
 
 		// search int
-		foundAddrs, err = memory.FindWord(targetVal, addrRanges, intPid)
+		foundAddrs, err = memory.FindWord(intPid, targetVal, addrRanges)
 		if err == nil {
 			if len(foundAddrs) > 0 {
 				founds = append(founds, Found{
@@ -62,7 +63,7 @@ func Find(pid string, targetVal string, dataType string) ([]Found, error) {
 			return founds, err
 		}
 		fmt.Println("------------------------")
-		foundAddrs, err = memory.FindDword(targetVal, addrRanges, intPid)
+		foundAddrs, err = memory.FindDword(intPid, targetVal, addrRanges)
 		if err == nil {
 			if len(foundAddrs) > 0 {
 				founds = append(founds, Found{
@@ -76,7 +77,7 @@ func Find(pid string, targetVal string, dataType string) ([]Found, error) {
 			return founds, err
 		}
 		fmt.Println("------------------------")
-		foundAddrs, err = memory.FindQword(targetVal, addrRanges, intPid)
+		foundAddrs, err = memory.FindQword(intPid, targetVal, addrRanges)
 		if err == nil {
 			if len(foundAddrs) > 0 {
 				founds = append(founds, Found{
@@ -91,7 +92,7 @@ func Find(pid string, targetVal string, dataType string) ([]Found, error) {
 		}
 
 	} else if dataType == "string" {
-		foundAddrs, _ := memory.FindString(targetVal, addrRanges, intPid)
+		foundAddrs, _ := memory.FindString(intPid, targetVal, addrRanges)
 		if err == nil {
 			if len(foundAddrs) > 0 {
 				founds = append(founds, Found{
@@ -106,7 +107,7 @@ func Find(pid string, targetVal string, dataType string) ([]Found, error) {
 		}
 
 	} else if dataType == "word" {
-		foundAddrs, err := memory.FindWord(targetVal, addrRanges, intPid)
+		foundAddrs, err := memory.FindWord(intPid, targetVal, addrRanges)
 		if err == nil {
 			if len(foundAddrs) > 0 {
 				founds = append(founds, Found{
@@ -121,7 +122,7 @@ func Find(pid string, targetVal string, dataType string) ([]Found, error) {
 		}
 
 	} else if dataType == "dword" {
-		foundAddrs, err := memory.FindDword(targetVal, addrRanges, intPid)
+		foundAddrs, err := memory.FindDword(intPid, targetVal, addrRanges)
 		if err == nil {
 			if len(foundAddrs) > 0 {
 				founds = append(founds, Found{
@@ -136,7 +137,7 @@ func Find(pid string, targetVal string, dataType string) ([]Found, error) {
 		}
 
 	} else if dataType == "qword" {
-		foundAddrs, err := memory.FindQword(targetVal, addrRanges, intPid)
+		foundAddrs, err := memory.FindQword(intPid, targetVal, addrRanges)
 		if err == nil {
 			if len(foundAddrs) > 0 {
 				founds = append(founds, Found{
@@ -152,6 +153,55 @@ func Find(pid string, targetVal string, dataType string) ([]Found, error) {
 	}
 
 	return nil, errors.New("Error: specified datatype does not exist")
+}
+
+func Filter(pid string, targetVal string, prevFounds []Found) ([]Found, error) {
+	founds := []Found{}
+	result, err := exec.Command("vmmap", "--wide", pid).Output()
+	if err != nil {
+		return nil, err
+	}
+	writableAddrRanges, err := memory.GetWritableAddrRanges(result)
+	if err != nil {
+		return nil, err
+	}
+
+	var intPid int
+	if intPid, err = strconv.Atoi(pid); err != nil {
+		return nil, err
+	}
+	addrRanges := [][2]int{}
+
+	// check if previous result address exists in current memory map
+	for i, prevFound := range prevFounds {
+		targetBytes, _ := prevFound.converter(targetVal)
+		targetLength := len(targetBytes)
+		fmt.Printf("Check previous results of searching %s...\n", prevFound.dataType)
+		fmt.Printf("Target Value: %s(%v)\n", targetVal, targetBytes)
+		for _, prevAddr := range prevFound.addrs {
+			for _, writable := range writableAddrRanges {
+				if writable[0] < prevAddr && prevAddr < writable[1] {
+					addrRanges = append(addrRanges, [2]int{prevAddr, prevAddr + targetLength})
+				}
+			}
+		}
+		foundAddrs, _ := memory.FindDataInAddrRanges(intPid, targetBytes, addrRanges)
+		fmt.Printf("Found: %d!!\n", len(foundAddrs))
+		if len(foundAddrs) < 10 {
+			for _, v := range foundAddrs {
+				fmt.Printf("Address: 0x%x\n", v)
+			}
+		}
+		founds = append(founds, Found{
+			addrs:     foundAddrs,
+			converter: prevFound.converter,
+			dataType:  prevFound.dataType,
+		})
+		if i != len(prevFounds)-1 {
+			fmt.Println("------------------------")
+		}
+	}
+	return founds, nil
 }
 
 func Attach(pid string) error {
@@ -211,5 +261,19 @@ func Patch(pid string, targetVal string, targetAddrs []Found) error {
 		}
 	}
 	fmt.Println("Successfully patched!")
+	return nil
+}
+
+func Dump(pid string, beginAddress int, endAddress int) error {
+	memSize := endAddress - beginAddress
+	buf := make([]byte, memSize)
+	intPid, _ := strconv.Atoi(pid)
+	task := memory.GetTaskForPid(intPid)
+	if err := memory.ReadMemory(task, buf, beginAddress, endAddress); err != nil {
+		return err
+	}
+	fmt.Printf("Address range: 0x%x - 0x%x\n", beginAddress, endAddress)
+	fmt.Println("--------------------------------------------")
+	fmt.Printf("%s", hex.Dump(buf))
 	return nil
 }

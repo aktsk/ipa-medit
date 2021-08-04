@@ -69,7 +69,7 @@ type TooManyErr struct {
 	*Err
 }
 
-func FindDataInAddrRanges(targetBytes []byte, addrRanges [][2]int, pid int) ([]int, error) {
+func FindDataInAddrRanges(pid int, targetBytes []byte, addrRanges [][2]int) ([]int, error) {
 	foundAddrs := []int{}
 	searchLength := len(targetBytes)
 	for _, s := range addrRanges {
@@ -94,8 +94,7 @@ func FindDataInAddrRanges(targetBytes []byte, addrRanges [][2]int, pid int) ([]i
 					return foundAddrs, TooManyErr{&Err{errors.New("Error: Too many addresses")}}
 				}
 			} else {
-				fmt.Printf("%x\n", beginAddr)
-				//fmt.Println(err)
+				fmt.Printf("0x%x: %s\n", beginAddr, err)
 			}
 		}
 	}
@@ -115,11 +114,11 @@ func findDataInSplittedMemory(memory *[]byte, targetBytes []byte, searchLength i
 	}
 }
 
-func FindString(targetVal string, addrRanges [][2]int, pid int) ([]int, error) {
+func FindString(pid int, targetVal string, addrRanges [][2]int) ([]int, error) {
 	fmt.Println("Search UTF-8 String...")
 	targetBytes, _ := converter.StringToBytes(targetVal)
 	fmt.Printf("Target Value: %s(%v)\n", targetVal, targetBytes)
-	foundAddrs, err := FindDataInAddrRanges(targetBytes, addrRanges, pid)
+	foundAddrs, err := FindDataInAddrRanges(pid, targetBytes, addrRanges)
 	fmt.Printf("Found: %d!!\n", len(foundAddrs))
 	if len(foundAddrs) < 10 {
 		for _, v := range foundAddrs {
@@ -129,7 +128,7 @@ func FindString(targetVal string, addrRanges [][2]int, pid int) ([]int, error) {
 	return foundAddrs, err
 }
 
-func FindWord(targetVal string, addrRanges [][2]int, pid int) ([]int, error) {
+func FindWord(pid int, targetVal string, addrRanges [][2]int) ([]int, error) {
 	fmt.Println("Search Word...")
 	targetBytes, err := converter.WordToBytes(targetVal)
 	if err != nil {
@@ -137,7 +136,7 @@ func FindWord(targetVal string, addrRanges [][2]int, pid int) ([]int, error) {
 		return nil, ParseErr{&Err{errors.New("Error: value out of range")}}
 	}
 	fmt.Printf("Target Value: %s(%v)\n", targetVal, targetBytes)
-	foundAddrs, err := FindDataInAddrRanges(targetBytes, addrRanges, pid)
+	foundAddrs, err := FindDataInAddrRanges(pid, targetBytes, addrRanges)
 	fmt.Printf("Found: %d!!\n", len(foundAddrs))
 	if len(foundAddrs) < 10 {
 		for _, v := range foundAddrs {
@@ -147,7 +146,7 @@ func FindWord(targetVal string, addrRanges [][2]int, pid int) ([]int, error) {
 	return foundAddrs, err
 }
 
-func FindDword(targetVal string, addrRanges [][2]int, pid int) ([]int, error) {
+func FindDword(pid int, targetVal string, addrRanges [][2]int) ([]int, error) {
 	fmt.Println("Search Double Word...")
 	targetBytes, err := converter.DwordToBytes(targetVal)
 	if err != nil {
@@ -155,7 +154,7 @@ func FindDword(targetVal string, addrRanges [][2]int, pid int) ([]int, error) {
 		return nil, ParseErr{&Err{errors.New("Error: value out of range")}}
 	}
 	fmt.Printf("Target Value: %s(%v)\n", targetVal, targetBytes)
-	foundAddrs, err := FindDataInAddrRanges(targetBytes, addrRanges, pid)
+	foundAddrs, err := FindDataInAddrRanges(pid, targetBytes, addrRanges)
 	fmt.Printf("Found: %d!!\n", len(foundAddrs))
 	if len(foundAddrs) < 10 {
 		for _, v := range foundAddrs {
@@ -165,7 +164,7 @@ func FindDword(targetVal string, addrRanges [][2]int, pid int) ([]int, error) {
 	return foundAddrs, err
 }
 
-func FindQword(targetVal string, addrRanges [][2]int, pid int) ([]int, error) {
+func FindQword(pid int, targetVal string, addrRanges [][2]int) ([]int, error) {
 	fmt.Println("Search Quad Word...")
 	targetBytes, err := converter.QwordToBytes(targetVal)
 	if err != nil {
@@ -173,7 +172,7 @@ func FindQword(targetVal string, addrRanges [][2]int, pid int) ([]int, error) {
 		return nil, ParseErr{&Err{errors.New("Error: value out of range")}}
 	}
 	fmt.Printf("Target Value: %s(%v)\n", targetVal, targetBytes)
-	foundAddrs, err := FindDataInAddrRanges(targetBytes, addrRanges, pid)
+	foundAddrs, err := FindDataInAddrRanges(pid, targetBytes, addrRanges)
 	fmt.Printf("Found: %d!!\n", len(foundAddrs))
 	if len(foundAddrs) < 10 {
 		for _, v := range foundAddrs {
