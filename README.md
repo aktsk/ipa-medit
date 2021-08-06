@@ -10,7 +10,7 @@ Ipa-medit is a memory search and patch tool for resigned ipa without jailbreak. 
 ## Motivation
 Memory modification is the easiest way to cheat in games, it is one of the items to be checked in the security test.
 There are also cheat tools that can be used casually like GameGem and iGameGuardian.
-However, there were no tools available for un-jailbroken device and CUI.
+However, there were no tools available for un-jailbroken device and CUI, Apple Silicon Mac.
 So I made it as a security testing tool.
 Android version is [aktsk/apk-medit](https://github.com/aktsk/apk-medit).
 
@@ -19,10 +19,11 @@ Android version is [aktsk/apk-medit](https://github.com/aktsk/apk-medit).
 
 ## Requirements
 - macOS
-  - You need to have a valid iOS Development certificate installed
-- Xcode
-- [libimobiledevice/libimobiledevice](https://github.com/libimobiledevice/libimobiledevice)
-- [libimobiledevice/ideviceinstaller](https://github.com/libimobiledevice/ideviceinstaller)
+  - You need to have a valid iOS Development certificate installed.
+- Only when targeting iOS apps running on an iPhone.
+  - Xcode
+  - [libimobiledevice/libimobiledevice](https://github.com/libimobiledevice/libimobiledevice)
+  - [libimobiledevice/ideviceinstaller](https://github.com/libimobiledevice/ideviceinstaller)
 
 ```
 $ brew install --HEAD libplist
@@ -113,7 +114,7 @@ Address: 0x10a2feea0
 ```
 
 By default, only integers are searched when targeting iOS apps running on iPhone, because the LLDB API is slow.
-When targeting an iOS app running on apple silicon, strings will also be searched.
+When targeting an iOS app running on Apple Silicon Mac, strings will also be searched.
 
 You can also specify datatype such as string, word, dword, qword.
 
