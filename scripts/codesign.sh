@@ -1,6 +1,7 @@
 #!/bin/bash
 
 CERT="ipa-medit-codesign"
+BINARY="./ipa-medit"
 
 function error() {
     echo error: "$@"
@@ -13,10 +14,14 @@ function cleanup {
 }
 
 function sign {
-    codesign -f -s ipa-medit-codesign --entitlements ./scripts/entitlements.plist ipa-medit
+    codesign -f -s ipa-medit-codesign --entitlements ./scripts/entitlements.plist "$BINARY"
 }
 
 trap cleanup EXIT
+
+if [ $# -eq 1 ]; then
+    BINARY=$1
+fi
 
 # Check if the certificate is already present in the system keychain
 security find-certificate -Z -p -c "$CERT" /Library/Keychains/System.keychain > /dev/null 2>&1
