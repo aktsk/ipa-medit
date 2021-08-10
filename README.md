@@ -10,19 +10,20 @@ Ipa-medit is a memory search and patch tool for resigned ipa without jailbreak. 
 ## Motivation
 Memory modification is the easiest way to cheat in games, it is one of the items to be checked in the security test.
 There are also cheat tools that can be used casually like GameGem and iGameGuardian.
-However, there were no tools available for un-jailbroken device and CUI.
+However, there were no tools available for un-jailbroken device and CUI, Apple Silicon Mac.
 So I made it as a security testing tool.
 Android version is [aktsk/apk-medit](https://github.com/aktsk/apk-medit).
 
 ## Demo
-<img src="screenshots/terminal.gif" width=850px>
+<img src="screenshots/desktop.gif" width=850px>
 
 ## Requirements
 - macOS
-  - You need to have a valid iOS Development certificate installed
-- Xcode
-- [libimobiledevice/libimobiledevice](https://github.com/libimobiledevice/libimobiledevice)
-- [libimobiledevice/ideviceinstaller](https://github.com/libimobiledevice/ideviceinstaller)
+  - You need to have a valid iOS Development certificate installed.
+- Only when targeting iOS apps running on an iPhone.
+  - Xcode
+  - [libimobiledevice/libimobiledevice](https://github.com/libimobiledevice/libimobiledevice)
+  - [libimobiledevice/ideviceinstaller](https://github.com/libimobiledevice/ideviceinstaller)
 
 ```
 $ brew install --HEAD libplist
@@ -34,21 +35,36 @@ $ brew install --HEAD ideviceinstaller
 ## Installation
 ### Binary
 Download the binary from [GitHub Releases](https://github.com/aktsk/ipa-medit/releases/) and drop it in your $PATH.
+If you are targeting an iOS app that runs on an Apple Silicon Mac, you will need to sign it.
+
+```
+$ script/codesign.sh <ipa-medit path>
+```
 
 ### Manually Build
 You need Go compiler.
+If you are targeting an IOS app that runs on an Apple Silicon Mac, you will need to sign it.
 
 ```
 $ go install github.com/aktsk/ipa-medit@latest
 ```
 
-## Usage
-To launch it, specify the executable file path contained in the .ipa file for `-bin` and the bundle id for `-id`.
+If you are targeting an iOS app that runs on an Apple Silicon Mac, you will need to sign it.
 
 ```
-$ unzip tap1000000.ipa
-$ ipa-medit -bin="./Payload/tap1000000.app/tap1000000" -id="jp.hoge.tap1000000"
+$ script/codesign.sh <ipa-medit path>
 ```
+
+Also, you can build it by using the make command.
+In this case, `script/codesign.sh` will be executed and signed automatically.
+
+```
+$ git clone git@github.com:aktsk/ipa-medit.git
+$ cd ipa-medit
+$ make build
+```
+
+## Usage
 
 The target .ipa file must be signed with a certificate installed on your computer. 
 If you want to modify memory on third-party applications, please use a tool such as [ipautil](https://github.com/aktsk/ipautil) for re-signing.
@@ -56,6 +72,24 @@ If you want to modify memory on third-party applications, please use a tool such
 ```
 $ ipautil decode tap1000000.ipa # unzip
 $ ipautil build Payload         # re-sign and generate .ipa file
+```
+
+### Targeting the iOS app on iPhone
+
+To launch it, you need to specify the executable file path contained in the .ipa file with `-bin` and the bundle id with `-id`.
+
+```
+$ unzip tap1000000.ipa
+$ ipa-medit -bin="./Payload/tap1000000.app/tap1000000" -id="jp.hoge.tap1000000"
+```
+
+### Targeting the iOS app on Apple Silicon Mac
+
+To launch it, you need to specify the process name with `-name` or the pid with `-pid`. 
+The process name and pid of the iOS app can be checked in the Activity Monitor.
+
+```
+$ ipa-medit -name <process name>
 ```
 
 ### Commands
@@ -79,11 +113,17 @@ Found: 1!!
 Address: 0x10a2feea0
 ```
 
-By default, only integer types are searched.
-If you want to search for strings as well, add "all" and specify the arguments as follows:
+By default, only integers are searched when targeting iOS apps running on iPhone, because the LLDB API is slow.
+When targeting an iOS app running on Apple Silicon Mac, strings will also be searched.
+
+You can also specify datatype such as string, word, dword, qword.
 
 ```
-> find all 999986
+> find dword 999994
+Search Double Word...
+Target Value: 999994([58 66 15 0])
+Found: 1!!
+Address: 0x11378aea0
 ```
 
 #### filter
@@ -104,8 +144,25 @@ Write the specified value on the address found by search.
 Successfully patched!
 ```
 
+#### attach
+Attach to the target process.
+
+```
+> attach
+Success to halt process
+```
+
+#### detach
+Detach from the attached process.
+
+```
+> detach
+Success to continue process
+```
+
 #### ps
 Get information about the target process.
+It will only work if you are targeting an IOS app running on an iPhone.
 
 ```
 > ps
@@ -121,49 +178,11 @@ thread #8: tid = 0x5461e, 0x00000001bd6791ac libsystem_kernel.dylib`__psynch_cvw
 thread #9: tid = 0x5461f, 0x00000001bd65530c libsystem_kernel.dylib`semaphore_wait_trap + 8, name = 'Job.Worker 0'
 thread #10: tid = 0x54620, 0x00000001bd65530c libsystem_kernel.dylib`semaphore_wait_trap + 8, name = 'Job.Worker 1'
 thread #11: tid = 0x54621, 0x00000001bd65530c libsystem_kernel.dylib`semaphore_wait_trap + 8, name = 'Job.Worker 2'
-thread #12: tid = 0x54622, 0x00000001bd65530c libsystem_kernel.dylib`semaphore_wait_trap + 8, name = 'Job.Worker 3'
-thread #13: tid = 0x54623, 0x00000001bd65530c libsystem_kernel.dylib`semaphore_wait_trap + 8, name = 'Job.Worker 4'
-thread #14: tid = 0x54624, 0x00000001bd65530c libsystem_kernel.dylib`semaphore_wait_trap + 8, name = 'Background Job.Worker 0'
-thread #15: tid = 0x54625, 0x00000001bd65530c libsystem_kernel.dylib`semaphore_wait_trap + 8, name = 'Background Job.Worker 1'
-thread #16: tid = 0x54626, 0x00000001bd65530c libsystem_kernel.dylib`semaphore_wait_trap + 8, name = 'Background Job.Worker 2'
-thread #17: tid = 0x54627, 0x00000001bd65530c libsystem_kernel.dylib`semaphore_wait_trap + 8, name = 'Background Job.Worker 3'
-thread #18: tid = 0x54628, 0x00000001bd65530c libsystem_kernel.dylib`semaphore_wait_trap + 8, name = 'Background Job.Worker 4'
-thread #19: tid = 0x54629, 0x00000001bd65530c libsystem_kernel.dylib`semaphore_wait_trap + 8, name = 'Background Job.Worker 5'
-thread #20: tid = 0x5462a, 0x00000001bd65530c libsystem_kernel.dylib`semaphore_wait_trap + 8, name = 'Background Job.Worker 6'
-thread #21: tid = 0x5462b, 0x00000001bd65530c libsystem_kernel.dylib`semaphore_wait_trap + 8, name = 'Background Job.Worker 7'
-thread #22: tid = 0x5462c, 0x00000001bd65530c libsystem_kernel.dylib`semaphore_wait_trap + 8, name = 'Background Job.Worker 8'
-thread #23: tid = 0x5462d, 0x00000001bd65530c libsystem_kernel.dylib`semaphore_wait_trap + 8, name = 'Background Job.Worker 9'
-thread #24: tid = 0x5462e, 0x00000001bd65530c libsystem_kernel.dylib`semaphore_wait_trap + 8, name = 'Background Job.Worker 10'
-thread #25: tid = 0x5462f, 0x00000001bd65530c libsystem_kernel.dylib`semaphore_wait_trap + 8, name = 'Background Job.Worker 11'
-thread #26: tid = 0x54630, 0x00000001bd65530c libsystem_kernel.dylib`semaphore_wait_trap + 8, name = 'Background Job.Worker 12'
-thread #27: tid = 0x54631, 0x00000001bd65530c libsystem_kernel.dylib`semaphore_wait_trap + 8, name = 'Background Job.Worker 13'
-thread #28: tid = 0x54632, 0x00000001bd65530c libsystem_kernel.dylib`semaphore_wait_trap + 8, name = 'Background Job.Worker 14'
-thread #29: tid = 0x54633, 0x00000001bd65530c libsystem_kernel.dylib`semaphore_wait_trap + 8, name = 'Background Job.Worker 15'
-thread #30: tid = 0x54634, 0x00000001bd65530c libsystem_kernel.dylib`semaphore_wait_trap + 8, name = 'BatchDeleteObjects'
-thread #31: tid = 0x54635, 0x00000001bd65530c libsystem_kernel.dylib`semaphore_wait_trap + 8, name = 'Loading.AsyncRead'
-thread #32: tid = 0x5463f, 0x00000001bd65530c libsystem_kernel.dylib`semaphore_wait_trap + 8, name = 'UnityGfxDeviceWorker'
-thread #33: tid = 0x54641, 0x00000001bd6552d0 libsystem_kernel.dylib`mach_msg_trap + 8, name = 'AVAudioSession Notify Thread'
-thread #34: tid = 0x54658, 0x00000001bd65530c libsystem_kernel.dylib`semaphore_wait_trap + 8
+...
 thread #35: tid = 0x54659, 0x00000001bd6552d0 libsystem_kernel.dylib`mach_msg_trap + 8, name = 'AURemoteIO::IOThread'
 thread #36: tid = 0x54662, 0x00000001bd679814 libsystem_kernel.dylib`__semwait_signal + 8
 thread #37: tid = 0x54663, 0x00000001bd6552d0 libsystem_kernel.dylib`mach_msg_trap + 8, name = 'com.apple.CoreMotion.MotionThread'
 thread #38: tid = 0x54664, 0x00000001bd65530c libsystem_kernel.dylib`semaphore_wait_trap + 8, name = 'Loading.PreloadManager'
-```
-
-#### attach
-Attach to the target process.
-
-```
-> attach
-Success to halt process
-```
-
-#### detach
-Detach from the attached process.
-
-```
-> detach
-Success to continue process
 ```
 
 #### exit
