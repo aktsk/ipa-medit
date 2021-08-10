@@ -37,14 +37,30 @@ func runMain() error {
 	var binPath string
 	var bundleID string
 	var pid string
+	var name string
 	flag.StringVar(&binPath, "bin", "", "specify ios app binary that unzip and extract from .ipa")
 	flag.StringVar(&bundleID, "id", "", "specify bundle id")
 	flag.StringVar(&pid, "pid", "", "specify pid running on the Apple Silicon Mac")
+	flag.StringVar(&name, "name", "", "specify process name running on the Apple Silicon Mac")
 	flag.Parse()
 
 	if pid != "" {
 		fmt.Println("Please use `exit` or `Ctrl-D` to exit this program.")
 		fmt.Printf("Target PID has been set to %s.\n", pid)
+		prompt.RunPrompt(pid)
+		return nil
+	}
+
+	if name != "" {
+		fmt.Println("Please use `exit` or `Ctrl-D` to exit this program.")
+		fmt.Printf("Target Process name has been set to %s.\n", name)
+		pid, err := prompt.GetPidByProcessName(name)
+		if err != nil {
+			return err
+		}
+		if pid == "" {
+			return errors.New("Process not found")
+		}
 		prompt.RunPrompt(pid)
 		return nil
 	}

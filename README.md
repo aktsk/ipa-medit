@@ -76,7 +76,7 @@ $ ipautil build Payload         # re-sign and generate .ipa file
 
 ### Targeting the iOS app on iPhone
 
-To launch it, specify the executable file path contained in the .ipa file for `-bin` and the bundle id for `-id`.
+To launch it, you need to specify the executable file path contained in the .ipa file with `-bin` and the bundle id with `-id`.
 
 ```
 $ unzip tap1000000.ipa
@@ -85,11 +85,11 @@ $ ipa-medit -bin="./Payload/tap1000000.app/tap1000000" -id="jp.hoge.tap1000000"
 
 ### Targeting the iOS app on Apple Silicon Mac
 
-To launch it, specify the pid for `-pid`. 
-The pid of the iOS app can be checked in the Activity Monitor.
+To launch it, you need to specify the process name with `-name` or the pid with `-pid`. 
+The process name and pid of the iOS app can be checked in the Activity Monitor.
 
 ```
-$ ipa-medit -pid <pid>
+$ ipa-medit -name <process name>
 ```
 
 ### Commands

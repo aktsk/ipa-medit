@@ -1,6 +1,8 @@
 package prompt
 
 import (
+	"bufio"
+	"bytes"
 	"fmt"
 	"log"
 	"os"
@@ -40,7 +42,7 @@ func executor(in string) {
 		if foundAddr, err := cmd.Find(appPID, targetVal, dataType); err == nil {
 			addrCache = foundAddr
 		}
-	
+
 	} else if strings.HasPrefix(in, "filter") {
 		if len(addrCache) == 0 {
 			fmt.Println("No previous results. ")
@@ -143,6 +145,21 @@ func RunPrompt(pid string) {
 		prompt.OptionDescriptionTextColor(prompt.DarkGray),
 	)
 	p.Run()
+}
+
+func GetPidByProcessName(name string) (string, error) {
+	psResult, err := exec.Command("ps", "-ceo", "pid=,comm=").Output()
+	if err != nil {
+		return "", err
+	}
+	scanner := bufio.NewScanner(bytes.NewReader(psResult))
+	for scanner.Scan() {
+		line := bytes.Split(scanner.Bytes(), []byte(" "))
+		if bytes.HasPrefix(line[1], []byte(name)) {
+			return string(line[0]), nil
+		}
+	}
+	return "", nil
 }
 
 func parseAddr(arg string) (int, error) {

@@ -9,8 +9,8 @@ import (
 
 	sys "golang.org/x/sys/unix"
 
-	"github.com/aktsk/ipa-medit/pkg/memory"
 	"github.com/aktsk/ipa-medit/pkg/converter"
+	"github.com/aktsk/ipa-medit/pkg/memory"
 )
 
 type Found struct {
@@ -33,7 +33,7 @@ func Find(pid string, targetVal string, dataType string) ([]Found, error) {
 	if intPid, err = strconv.Atoi(pid); err != nil {
 		return nil, err
 	}
-	
+
 	if dataType == "all" {
 		// search string
 		foundAddrs, err := memory.FindString(intPid, targetVal, addrRanges)
@@ -216,7 +216,7 @@ func Attach(pid string) error {
 	if intPid, err = strconv.Atoi(pid); err != nil {
 		return err
 	}
-	
+
 	if err := sys.PtraceAttach(intPid); err == nil {
 		fmt.Printf("Attached PID: %s\n", pid)
 	} else {
@@ -244,7 +244,7 @@ func Detach(pid string) error {
 	} else {
 		fmt.Printf("Detached PID: %s\n", pid)
 	}
-	
+
 	isAttached = false
 	return err
 }
