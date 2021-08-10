@@ -15,7 +15,7 @@ So I made it as a security testing tool.
 Android version is [aktsk/apk-medit](https://github.com/aktsk/apk-medit).
 
 ## Demo
-<img src="screenshots/terminal.gif" width=850px>
+<img src="screenshots/desktop.gif" width=850px>
 
 ## Requirements
 - macOS
