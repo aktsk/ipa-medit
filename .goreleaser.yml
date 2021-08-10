@@ -12,7 +12,7 @@ builds:
       - -X main.Version={{.Version}}
       - -X main.Revision={{.ShortCommit}}
     env:
-      - CGO_ENABLED=0
+      - CGO_ENABLED=1
     goos:
       - darwin
     goarch:
