@@ -162,6 +162,21 @@ func GetPidByProcessName(name string) (string, error) {
 	return "", nil
 }
 
+func CheckPidExists(pid string) (bool, error) {
+	psResult, err := exec.Command("ps", "-ceo", "pid=,comm=").Output()
+	if err != nil {
+		return false, err
+	}
+	scanner := bufio.NewScanner(bytes.NewReader(psResult))
+	for scanner.Scan() {
+		line := bytes.Split(scanner.Bytes(), []byte(" "))
+		if pid == string(line[0]) {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
 func parseAddr(arg string) (int, error) {
 	arg = strings.Replace(arg, "0x", "", 1)
 	address, err := strconv.ParseInt(arg, 16, 64)

@@ -47,8 +47,15 @@ func runMain() error {
 	if pid != "" {
 		fmt.Println("Please use `exit` or `Ctrl-D` to exit this program.")
 		fmt.Printf("Target PID has been set to %s.\n", pid)
-		prompt.RunPrompt(pid)
-		return nil
+		if result, err := prompt.CheckPidExists(pid); err == nil {
+			if result {
+				prompt.RunPrompt(pid)
+			} else {
+				return errors.New("There is no process with the specified pid.")
+			}
+		} else {
+			return err
+		}
 	}
 
 	if name != "" {
@@ -59,18 +66,18 @@ func runMain() error {
 			return err
 		}
 		if pid == "" {
-			return errors.New("Process not found")
+			return errors.New("Process not found.")
 		}
 		prompt.RunPrompt(pid)
 		return nil
 	}
 
 	if binPath == "" {
-		return errors.New("bin option is required")
+		return errors.New("bin option is required.")
 	}
 
 	if bundleID == "" {
-		return errors.New("id option is required")
+		return errors.New("id option is required.")
 	}
 
 	if err := lldb.PreparePythonFile(); err != nil {
@@ -88,7 +95,7 @@ func runMain() error {
 		return err
 	}
 
-	fmt.Println("Start to proxy a debugserver connection from a device for remote debugging")
+	fmt.Println("Start to proxy a debugserver connection from a device for remote debugging...")
 	defer closer()
 	if err := runApp(binPath, bundleID); err != nil {
 		return err
