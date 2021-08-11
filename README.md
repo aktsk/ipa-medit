@@ -38,7 +38,7 @@ Download the binary from [GitHub Releases](https://github.com/aktsk/ipa-medit/re
 
 ### Manually Build
 You can build it by using the make command.
-You need Go compiler.
+Go compiler is required to build.
 If you are targeting an iOS app that runs on an Apple Silicon Mac, you will need to sign it, but `script/codesign.sh` will be executed and signed automatically.
 
 ```
