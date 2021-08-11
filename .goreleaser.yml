@@ -17,7 +17,6 @@ builds:
       - darwin
     goarch:
       - amd64
-      - arm64
 archives:
   - name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
     replacements:

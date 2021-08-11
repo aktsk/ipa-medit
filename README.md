@@ -33,30 +33,13 @@ $ brew install --HEAD ideviceinstaller
 ```
 
 ## Installation
-### Binary
+### Binary(Intell Mac Only)
 Download the binary from [GitHub Releases](https://github.com/aktsk/ipa-medit/releases/) and drop it in your $PATH.
-If you are targeting an iOS app that runs on an Apple Silicon Mac, you will need to sign it.
-
-```
-$ script/codesign.sh <ipa-medit path>
-```
 
 ### Manually Build
+You can build it by using the make command.
 You need Go compiler.
-If you are targeting an IOS app that runs on an Apple Silicon Mac, you will need to sign it.
-
-```
-$ go install github.com/aktsk/ipa-medit@latest
-```
-
-If you are targeting an iOS app that runs on an Apple Silicon Mac, you will need to sign it.
-
-```
-$ script/codesign.sh <ipa-medit path>
-```
-
-Also, you can build it by using the make command.
-In this case, `script/codesign.sh` will be executed and signed automatically.
+If you are targeting an iOS app that runs on an Apple Silicon Mac, you will need to sign it, but `script/codesign.sh` will be executed and signed automatically.
 
 ```
 $ git clone git@github.com:aktsk/ipa-medit.git
