@@ -148,7 +148,7 @@ func RunPrompt(pid string) {
 }
 
 func GetPidByProcessName(name string) (string, error) {
-	psResult, err := exec.Command("ps", "-ceo", "pid=,comm=").Output()
+	psResult, err := exec.Command("/bin/ps", "-ceo", "pid=,comm=").Output()
 	if err != nil {
 		return "", err
 	}
@@ -163,7 +163,7 @@ func GetPidByProcessName(name string) (string, error) {
 }
 
 func CheckPidExists(pid string) (bool, error) {
-	psResult, err := exec.Command("ps", "-ceo", "pid=,comm=").Output()
+	psResult, err := exec.Command("/bin/ps", "-ceo", "pid=,comm=").Output()
 	if err != nil {
 		return false, err
 	}
