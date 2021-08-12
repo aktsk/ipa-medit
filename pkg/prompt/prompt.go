@@ -172,8 +172,9 @@ func CheckPidExists(pid string) (bool, error) {
 	scanner := bufio.NewScanner(bytes.NewReader(psResult))
 	for scanner.Scan() {
 		line := bytes.Split(scanner.Bytes(), []byte(" "))
+		lineName := bytes.TrimSpace(line[1])
 		linePid := bytes.TrimSpace(line[0])
-		if pid == string(linePid) {
+		if pid == string(linePid) || pid == string(lineName) {
 			return true, nil
 		}
 	}
