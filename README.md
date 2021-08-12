@@ -145,7 +145,7 @@ Success to continue process
 
 #### ps
 Get information about the target process.
-It will only work if you are targeting an IOS app running on an iPhone.
+It will only work if you are targeting an iOS app running on an iPhone.
 
 ```
 > ps
