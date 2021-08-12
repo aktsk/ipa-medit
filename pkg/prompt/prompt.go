@@ -148,29 +148,32 @@ func RunPrompt(pid string) {
 }
 
 func GetPidByProcessName(name string) (string, error) {
-	psResult, err := exec.Command("ps", "-ceo", "pid=,comm=").Output()
+	psResult, err := exec.Command("/bin/ps", "-ceo", "pid=,comm=").Output()
 	if err != nil {
 		return "", err
 	}
 	scanner := bufio.NewScanner(bytes.NewReader(psResult))
 	for scanner.Scan() {
 		line := bytes.Split(scanner.Bytes(), []byte(" "))
-		if bytes.HasPrefix(line[1], []byte(name)) {
-			return string(line[0]), nil
+		line_name := bytes.TrimSpace(line[1])
+		line_pid := bytes.TrimSpace(line[0])
+		if bytes.HasPrefix(line_name, []byte(name)) {
+			return string(line_pid), nil
 		}
 	}
 	return "", nil
 }
 
 func CheckPidExists(pid string) (bool, error) {
-	psResult, err := exec.Command("ps", "-ceo", "pid=,comm=").Output()
+	psResult, err := exec.Command("/bin/ps", "-ceo", "pid=,comm=").Output()
 	if err != nil {
 		return false, err
 	}
 	scanner := bufio.NewScanner(bytes.NewReader(psResult))
 	for scanner.Scan() {
 		line := bytes.Split(scanner.Bytes(), []byte(" "))
-		if pid == string(line[0]) {
+		line_pid := bytes.TrimSpace(line[0])
+		if pid == string(line_pid) {
 			return true, nil
 		}
 	}

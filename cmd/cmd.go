@@ -23,7 +23,7 @@ var isAttached = false
 
 func Find(pid string, targetVal string, dataType string) ([]Found, error) {
 	founds := []Found{}
-	result, err := exec.Command("vmmap", "--wide", pid).Output()
+	result, err := exec.Command("/usr/bin/vmmap", "--wide", pid).Output()
 	if err != nil {
 		return nil, err
 	}
@@ -157,7 +157,7 @@ func Find(pid string, targetVal string, dataType string) ([]Found, error) {
 
 func Filter(pid string, targetVal string, prevFounds []Found) ([]Found, error) {
 	founds := []Found{}
-	result, err := exec.Command("vmmap", "--wide", pid).Output()
+	result, err := exec.Command("/usr/bin/vmmap", "--wide", pid).Output()
 	if err != nil {
 		return nil, err
 	}
