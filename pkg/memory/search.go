@@ -26,11 +26,11 @@ func GetWritableAddrRanges(vmmapResult []byte) ([][2]int, error) {
 
 		if writable && !bytes.HasPrefix(line, []byte("REGION TYPE")) {
 			meminfo := bytes.Fields(line)
-			region_type := meminfo[0]
+			regionType := meminfo[0]
 			i := 0
 			for i = 0; i < 3; i++ {
 				if (bytes.Index(line, meminfo[i+1]) - bytes.Index(line, meminfo[i]) - len(meminfo[i])) == 1 {
-					region_type = append(region_type, meminfo[i+1]...)
+					regionType = append(regionType, meminfo[i+1]...)
 				} else {
 					break
 				}

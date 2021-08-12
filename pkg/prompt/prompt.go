@@ -155,10 +155,10 @@ func GetPidByProcessName(name string) (string, error) {
 	scanner := bufio.NewScanner(bytes.NewReader(psResult))
 	for scanner.Scan() {
 		line := bytes.Split(scanner.Bytes(), []byte(" "))
-		line_name := bytes.TrimSpace(line[1])
-		line_pid := bytes.TrimSpace(line[0])
-		if bytes.HasPrefix(line_name, []byte(name)) {
-			return string(line_pid), nil
+		lineName := bytes.TrimSpace(line[1])
+		linePid := bytes.TrimSpace(line[0])
+		if bytes.HasPrefix(lineName, []byte(name)) {
+			return string(linePid), nil
 		}
 	}
 	return "", nil
@@ -172,8 +172,8 @@ func CheckPidExists(pid string) (bool, error) {
 	scanner := bufio.NewScanner(bytes.NewReader(psResult))
 	for scanner.Scan() {
 		line := bytes.Split(scanner.Bytes(), []byte(" "))
-		line_pid := bytes.TrimSpace(line[0])
-		if pid == string(line_pid) {
+		linePid := bytes.TrimSpace(line[0])
+		if pid == string(linePid) {
 			return true, nil
 		}
 	}
