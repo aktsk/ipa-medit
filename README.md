@@ -5,7 +5,9 @@
 [![](https://img.shields.io/badge/Black%20Hat%20Arsenal-USA%202021-blue.svg)](https://www.blackhat.com/us-21/arsenal/schedule/index.html#ipa-medit-memory-search-and-patch-tool-for-ipa-without-jailbreaking-24072)
 ![](https://github.com/aktsk/ipa-medit/workflows/test/badge.svg)
 
-Ipa-medit is a memory search and patch tool for resigned ipa without jailbreak. It was created for mobile game security testing.
+Ipa-medit is a memory search and patch tool for resigned ipa without jailbreaking. 
+It ｓupports iOS apps running on iPhone and Apple Silicon Mac.
+It was created for mobile game security testing.
 
 ## Motivation
 Memory modification is the easiest way to cheat in games, it is one of the items to be checked in the security test.
