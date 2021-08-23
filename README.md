@@ -6,7 +6,7 @@
 ![](https://github.com/aktsk/ipa-medit/workflows/test/badge.svg)
 
 Ipa-medit is a memory search and patch tool for resigned ipa without jailbreaking. 
-It ｓupports iOS apps running on iPhone and Apple Silicon Mac.
+It supports iOS apps running on iPhone and Apple Silicon Mac.
 It was created for mobile game security testing.
 
 ## Motivation
