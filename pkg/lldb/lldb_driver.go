@@ -19,7 +19,13 @@ env = []
 for k, v in os.environ.items():
     env.append(k + '=' + v)
 
-sys.path.append('/Applications/Xcode.app/Contents/SharedFrameworks/LLDB.framework/Resources/Python3')
+lldb_python3_path = '/Applications/Xcode.app/Contents/SharedFrameworks/LLDB.framework/Resources/Python3'
+lldb_python_path = '/Applications/Xcode.app/Contents/SharedFrameworks/LLDB.framework/Resources/Python'
+if os.path.exists(lldb_python3_path):
+    sys.path.append(lldb_python3_path)
+else:
+    # https://github.com/aktsk/ipa-medit/issues/8
+    sys.path.append(lldb_python_path)
 
 try:
     import lldb
