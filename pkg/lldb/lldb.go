@@ -6,7 +6,6 @@ package lldb
 import (
 	"bytes"
 	"crypto/sha256"
-	"fmt"
 	"io"
 	"os"
 	"os/exec"
