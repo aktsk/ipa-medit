@@ -15,6 +15,7 @@
 # vendor/
 
 ipa-medit
+lldb-driver.py
 
 # goreleaser
 dist/
