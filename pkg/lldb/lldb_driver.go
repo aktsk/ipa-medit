@@ -3,8 +3,7 @@
 
 package lldb
 
-const pythonData string = `
-#!/usr/bin/env python3
+const pythonData string = `#!/usr/bin/env python3
 # coding: UTF-8
 
 import multiprocessing

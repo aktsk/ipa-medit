@@ -5,11 +5,13 @@ package lldb
 
 import (
 	"bytes"
+	"crypto/sha256"
 	"io"
 	"os"
 	"os/exec"
 	"os/signal"
 	"path/filepath"
+	"reflect"
 	"syscall"
 )
 
@@ -20,6 +22,25 @@ func fileExists(filepath string) bool {
 	return err == nil
 }
 
+func calcFileHash(filepath string) []byte {
+	f, _ := os.Open(filepath)
+	defer f.Close()
+
+	h := sha256.New()
+	io.Copy(h, f)
+
+	return h.Sum(nil)
+}
+
+func makePythonFile(filepath string) error {
+	fp, err := os.Create(filepath)
+	if err != nil {
+		return err
+	}
+	fp.WriteString(pythonData)
+	return nil
+}
+
 func PreparePythonFile() error {
 	exePath, err := os.Executable()
 	if err != nil {
@@ -27,11 +48,13 @@ func PreparePythonFile() error {
 	}
 	pyPath = filepath.Join(filepath.Dir(exePath), "lldb-driver.py")
 	if !fileExists(pyPath) {
-		fp, err := os.Create(pyPath)
-		if err != nil {
-			return err
+		makePythonFile(pyPath)
+	} else {
+		pyDataHash := sha256.Sum256([]byte(pythonData))
+		fileHash := calcFileHash(pyPath)
+		if !reflect.DeepEqual(pyDataHash[:], fileHash) {
+			makePythonFile(pyPath)
 		}
-		fp.WriteString(pythonData)
 	}
 	return nil
 }
