@@ -8,6 +8,7 @@
 Ipa-medit is a memory search and patch tool for resigned ipa without jailbreaking. 
 It supports iOS apps running on iPhone and Apple Silicon Mac.
 It was created for mobile game security testing.
+Many mobile games have jailbreak detection, but ipa-medit does not require jailbreaking, so memory modification can be done without bypassing the jailbreak detection.
 
 ## Motivation
 Memory modification is the easiest way to cheat in games, it is one of the items to be checked in the security test.
