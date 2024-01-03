@@ -1,9 +1,9 @@
 # ipa-medit
 
 [![GitHub release](https://img.shields.io/github/v/release/aktsk/ipa-medit.svg)](https://github.com/aktsk/ipa-medit/releases/latest)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/aktsk/ipa-medit/blob/master/LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/aktsk/ipa-medit/blob/main/LICENSE)
 [![](https://img.shields.io/badge/Black%20Hat%20Arsenal-USA%202021-blue.svg)](https://www.blackhat.com/us-21/arsenal/schedule/index.html#ipa-medit-memory-search-and-patch-tool-for-ipa-without-jailbreaking-24072)
-![](https://github.com/aktsk/ipa-medit/workflows/test/badge.svg)
+![](https://github.com/aktsk/ipa-medit/workflows/test/badge.svg?branch=main)
 
 Ipa-medit is a memory search and patch tool for resigned ipa without jailbreaking. 
 It supports iOS apps running on iPhone and Apple Silicon Mac.
