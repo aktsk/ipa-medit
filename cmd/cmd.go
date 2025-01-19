@@ -9,8 +9,8 @@ import (
 
 	sys "golang.org/x/sys/unix"
 
-	"github.com/aktsk/ipa-medit/pkg/converter"
-	"github.com/aktsk/ipa-medit/pkg/memory"
+	"github.com/sterrasec/ipa-medit/pkg/converter"
+	"github.com/sterrasec/ipa-medit/pkg/memory"
 )
 
 type Found struct {

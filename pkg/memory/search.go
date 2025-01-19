@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"sync"
 
-	"github.com/aktsk/ipa-medit/pkg/converter"
+	"github.com/sterrasec/ipa-medit/pkg/converter"
 )
 
 func GetWritableAddrRanges(vmmapResult []byte) ([][2]int, error) {

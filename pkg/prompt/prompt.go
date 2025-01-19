@@ -13,7 +13,7 @@ import (
 
 	prompt "github.com/c-bata/go-prompt"
 
-	"github.com/aktsk/ipa-medit/cmd"
+	"github.com/sterrasec/ipa-medit/cmd"
 )
 
 var appPID string

@@ -1,9 +1,9 @@
 # ipa-medit
 
-[![GitHub release](https://img.shields.io/github/v/release/aktsk/ipa-medit.svg)](https://github.com/aktsk/ipa-medit/releases/latest)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/aktsk/ipa-medit/blob/main/LICENSE)
+[![GitHub release](https://img.shields.io/github/v/release/sterrasec/ipa-medit.svg)](https://github.com/sterrasec/ipa-medit/releases/latest)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/sterrasec/ipa-medit/blob/main/LICENSE)
 [![](https://img.shields.io/badge/Black%20Hat%20Arsenal-USA%202021-blue.svg)](https://www.blackhat.com/us-21/arsenal/schedule/index.html#ipa-medit-memory-search-and-patch-tool-for-ipa-without-jailbreaking-24072)
-![](https://github.com/aktsk/ipa-medit/actions/workflows/test.yml/badge.svg?branch=main)
+![](https://github.com/sterrasec/ipa-medit/actions/workflows/test.yml/badge.svg?branch=main)
 
 Ipa-medit is a memory search and patch tool for resigned ipa without jailbreaking. 
 It supports iOS apps running on iPhone and Apple Silicon Mac.
@@ -15,7 +15,7 @@ Memory modification is the easiest way to cheat in games, it is one of the items
 There are also cheat tools that can be used casually like GameGem and iGameGuardian.
 However, there were no tools available for un-jailbroken device and CUI, Apple Silicon Mac.
 So I made it as a security testing tool.
-Android version is [aktsk/apk-medit](https://github.com/aktsk/apk-medit).
+Android version is [sterrasec/apk-medit](https://github.com/sterrasec/apk-medit).
 
 ## Demo
 <img src="screenshots/desktop.gif" width=850px>
@@ -37,7 +37,7 @@ $ brew install --HEAD ideviceinstaller
 
 ## Installation
 ### Binary(Intell Mac Only)
-Download the binary from [GitHub Releases](https://github.com/aktsk/ipa-medit/releases/) and drop it in your $PATH.
+Download the binary from [GitHub Releases](https://github.com/sterrasec/ipa-medit/releases/) and drop it in your $PATH.
 
 ### Manually Build
 You can build it by using the make command.
@@ -45,7 +45,7 @@ Go compiler is required to build.
 If you are targeting an iOS app that runs on an Apple Silicon Mac, you will need to sign it, but `script/codesign.sh` will be executed and signed automatically.
 
 ```
-$ git clone git@github.com:aktsk/ipa-medit.git
+$ git clone git@github.com:sterrasec/ipa-medit.git
 $ cd ipa-medit
 $ make build
 ```
@@ -53,7 +53,7 @@ $ make build
 ## Usage
 
 The target .ipa file must be signed with a certificate installed on your computer. 
-If you want to modify memory on third-party applications, please use a tool such as [ipautil](https://github.com/aktsk/ipautil) for re-signing.
+If you want to modify memory on third-party applications, please use a tool such as [ipautil](https://github.com/sterrasec/ipautil) for re-signing.
 
 ```
 $ ipautil decode tap1000000.ipa # unzip
