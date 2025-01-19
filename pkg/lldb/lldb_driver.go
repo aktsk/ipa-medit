@@ -23,7 +23,7 @@ lldb_python_path = '/Applications/Xcode.app/Contents/SharedFrameworks/LLDB.frame
 if os.path.exists(lldb_python3_path):
     sys.path.append(lldb_python3_path)
 else:
-    # https://github.com/aktsk/ipa-medit/issues/8
+    # https://github.com/sterrasec/ipa-medit/issues/8
     sys.path.append(lldb_python_path)
 
 try:

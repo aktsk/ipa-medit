@@ -7,9 +7,9 @@ import (
 	"log"
 	"unsafe"
 
-	"github.com/aktsk/ipa-medit/pkg/idevice"
-	"github.com/aktsk/ipa-medit/pkg/lldb"
-	"github.com/aktsk/ipa-medit/pkg/prompt"
+	"github.com/sterrasec/ipa-medit/pkg/idevice"
+	"github.com/sterrasec/ipa-medit/pkg/lldb"
+	"github.com/sterrasec/ipa-medit/pkg/prompt"
 )
 
 func runApp(binPath string, bundleID string) error {

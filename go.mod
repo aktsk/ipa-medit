@@ -1,4 +1,4 @@
-module github.com/aktsk/ipa-medit
+module github.com/sterrasec/ipa-medit
 
 go 1.16
 
